@@ -11,6 +11,7 @@ view: sessions {
     }
   }
   dimension: unique_session_id {
+    hidden: yes
     primary_key: yes
     label: "Events GA Session ID"
   }
@@ -26,17 +27,26 @@ view: sessions {
     type: duration
     sql_start: ${session_start_raw} ;;
     sql_end: ${session_end_raw} ;;
-    intervals: [second, minute]
+    intervals: [second, minute, hour, day]
+  }
+  dimension: session_duration_tier {
+    group_label: "Duration Session"
+    label: "Session Duration Tiers"
+    description: "The length (returned as a string) of a session measured in seconds and reported in second increments."
+    type: tier
+    sql: ${seconds_session} ;;
+    tiers: [10,30,60,120,180,240,300,600]
+    style: integer
   }
   dimension: is_bounce {
     type: yesno
-    sql: ${minutes_session} < 1 ;;
+    sql: ${seconds_session} < 30 ;;
   }
   measure: average_session_duration_mins {
-    label: "Average Session Duration (Mins)"
+    label: "Average Session Duration (mins)"
     type: average
     sql: ${minutes_session} ;;
-    value_format_name: decimal_0
+    value_format_name: decimal_1
   }
   measure: count_of_bounced_sessions {
     hidden: no
