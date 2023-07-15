@@ -100,7 +100,7 @@ view: events {
 
   dimension_group: event {
     type: time
-    timeframes: [date, week, day_of_week, day_of_month, month, year]
+    timeframes: [date, week, day_of_week, day_of_month, month, month_name, year]
     sql: TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'\d\d\d\d\d\d\d\d'))) ;;
   }
 
@@ -121,12 +121,13 @@ view: events {
   dimension_group: one_month_ago {
     type: time
     hidden: yes
-    sql: DATE_SUB(current_timestamp(), INTERVAL 1 MONTH) ;;
+    sql: DATE_SUB(current_date(), INTERVAL 1 MONTH) ;;
     timeframes: [month]
   }
 
   dimension: event_time_period {
-    label: "Event"
+    group_label: "Event Date"
+    label: "Period"
     sql:
       case
         when ${event_month} = ${today_month} then "This Month"
