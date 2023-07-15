@@ -476,9 +476,9 @@ view: events {
           {% if current_date_range._is_filtered %}
               CASE
               WHEN {% condition current_date_range %} ${_event_raw} {% endcondition %}
-              THEN DATE_DIFF( DATE({% date_start current_date_range %}), DATE(${event_date}), DAY) + 1
-              WHEN DATE(${event_date}) between ${period_2_start} and ${period_2_end}
-              THEN DATE_DIFF(${period_2_start}, DATE(${event_date}), DAY) + 1
+              THEN DATE_DIFF( DATE({% date_start current_date_range %}), ${event_date}, DAY) + 1
+              WHEN ${event_date} between ${period_2_start} and ${period_2_end}
+              THEN DATE_DIFF(${period_2_start}, ${event_date}, DAY) + 1
               END
           {% else %} NULL
           {% endif %}
@@ -491,9 +491,9 @@ view: events {
       sql:
         {% if current_date_range._is_filtered %}
             CASE
-            WHEN {% condition current_date_range %} ${event_date} {% endcondition %}
+            WHEN {% condition current_date_range %} ${_event_raw} {% endcondition %}
             THEN 1
-            WHEN DATE(${event_date}) between ${period_2_start} and ${period_2_end}
+            WHEN ${event_date} between ${period_2_start} and ${period_2_end}
             THEN 2
             END
         {% else %}
@@ -502,21 +502,12 @@ view: events {
         ;;
     }
 
-    ## ------- HIDING FIELDS  FROM ORIGINAL VIEW FILE  -------- ##
-
-    # dimension_group: created {hidden: yes}
-    # dimension: ytd_only {hidden:yes}
-    # dimension: mtd_only {hidden:yes}
-    # dimension: wtd_only {hidden:yes}
-
-
 ## ------------------ DIMENSIONS TO PLOT ------------------ ##
 
     dimension_group: date_in_period {
       description: "Use this as your grouping dimension when comparing periods. Aligns the previous periods onto the current period"
       label: "Current Period"
       type: time
-      # sql: DATE_ADD( ${day_in_period} - 1, DATE({% date_start current_date_range %}), DAY) ;;
       sql: DATE_SUB(DATE({% date_start current_date_range %}), INTERVAL (${day_in_period} - 1) DAY)  ;;
       view_label: "_PoP"
       timeframes: [
@@ -544,9 +535,9 @@ view: events {
       sql:
         {% if current_date_range._is_filtered %}
             CASE
-            WHEN {% condition current_date_range %} ${event_date} {% endcondition %}
+            WHEN {% condition current_date_range %} ${_event_raw} {% endcondition %}
             THEN 'This {% parameter compare_to %}'
-            WHEN DATE(${event_date}) between ${period_2_start} and ${period_2_end}
+            WHEN ${event_date} between ${period_2_start} and ${period_2_end}
             THEN 'Last {% parameter compare_to %}'
             END
         {% else %}
@@ -565,8 +556,9 @@ view: events {
       sql:
         {% if current_date_range._is_filtered %}
             CASE
-            WHEN {% condition current_date_range %} ${event_date} {% endcondition %} THEN 'this'
-            WHEN DATE(${event_date}) between ${period_2_start} and ${period_2_end} THEN 'last' END
+            WHEN {% condition current_date_range %} ${_event_raw} {% endcondition %} THEN 'this'
+            WHEN ${event_date} between ${period_2_start} and ${period_2_end} THEN 'last'
+          END
         {% else %} NULL {% endif %} ;;
     }
 
