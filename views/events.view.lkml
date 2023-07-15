@@ -100,7 +100,7 @@ view: events {
 
   dimension_group: event {
     type: time
-    timeframes: [date, week, day_of_week, month, year]
+    timeframes: [date, week, day_of_week, day_of_month, month, year]
     sql: TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'\d\d\d\d\d\d\d\d'))) ;;
   }
 
@@ -109,6 +109,30 @@ view: events {
     timeframes: [raw,time,hour,minute]
     type: time
     sql: TIMESTAMP_MICROS(${TABLE}.event_timestamp) ;;
+  }
+
+  dimension_group: today {
+    type: time
+    hidden: yes
+    sql: current_timestamp() ;;
+    timeframes: [raw, day_of_month, month]
+  }
+
+  dimension_group: one_month_ago {
+    type: time
+    hidden: yes
+    sql: DATE_SUB(current_timestamp(), INTERVAL 1 MONTH) ;;
+    timeframes: [month]
+  }
+
+  dimension: event_time_period {
+    label: "Event"
+    sql:
+      case
+        when ${event_month} = ${today_month} then "This Month"
+        when ${event_month} = ${one_month_ago_month} and ${event_day_of_month} <= ${today_day_of_month} then "Last Month to Date"
+      end
+    ;;
   }
 
   dimension: attribution_channel {
