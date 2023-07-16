@@ -389,7 +389,11 @@ view: events {
     sql: MAX(${_event_raw}) ;;
   }
 
-
+  measure: landing_page {
+    type: string
+    hidden: yes
+    sql: array_agg(case when ${page_views.page_view_rank_asc}=1 then ${page} end ignore nulls)[0] ;;
+  }
 
     filter: current_date_range {
       type: date

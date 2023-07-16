@@ -7,6 +7,11 @@ view: sessions {
       column: unique_session_id {}
       column: first_event {}
       column: last_event {}
+      column: user_pseudo_id {}
+      column: landing_page {}
+      derived_column: previous_session_timestamp {
+        sql: lag(last_event) over (partition by user_pseudo_id order by first_event asc);;
+        }
       bind_all_filters: yes
     }
   }
@@ -23,11 +28,27 @@ view: sessions {
     type: time
     sql: ${TABLE}.last_event ;;
   }
+  dimension: landing_page {
+    type: string
+    sql: ${TABLE}.landing_page ;;
+  }
   dimension_group: session {
     type: duration
     sql_start: ${session_start_raw} ;;
     sql_end: ${session_end_raw} ;;
     intervals: [second, minute, hour, day]
+  }
+  dimension_group: previous_session {
+    hidden: yes
+    type: time
+    timeframes: [raw]
+    sql: ${TABLE}.previous_session_timestamp ;;
+  }
+  dimension_group: since_previous_session {
+    type: duration
+    intervals: [minute, hour, day]
+    sql_start: ${previous_session_raw} ;;
+    sql_end: ${session_end_raw} ;;
   }
   dimension: session_duration_tier {
     group_label: "Duration Session"
