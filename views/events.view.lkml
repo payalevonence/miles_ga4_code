@@ -99,7 +99,7 @@ view: events {
 
   dimension: unique_session_id {
     type: string
-    sql: concat(${event_date}, '-', ${ga_session_id}, '-', ${ga_session_number}, '-' ${user_pseudo_id}) ;;
+    sql: concat(${event_date}, '-', ${ga_session_id}, '-', ${ga_session_number}, '-', ${user_pseudo_id}) ;;
   }
 
   dimension: page_title {
