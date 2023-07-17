@@ -15,6 +15,39 @@ view: events {
     }
   }
 
+  parameter: audience_selector {
+    description: "Use to set 'Audience Trait' field to dynamically choose a user cohort."
+    type: string
+    allowed_value: { value: "Device" }
+    allowed_value: { value: "Operating System" }
+    allowed_value: { value: "Browser" }
+    allowed_value: { value: "Country" }
+    allowed_value: { value: "Continent" }
+    allowed_value: { value: "Metro" }
+    allowed_value: { value: "Language" }
+    allowed_value: { value: "Channel" }
+    allowed_value: { value: "Medium" }
+    allowed_value: { value: "Source" }
+    default_value: "Source"
+  }
+
+  dimension: audience_trait {
+    description: "Dynamic cohort field based on value set in 'Audience Selector' filter."
+    type: string
+    sql: CASE
+              WHEN {% parameter audience_selector %} = 'Channel' THEN ${attribution_channel}
+              WHEN {% parameter audience_selector %} = 'Medium' THEN ${traffic_source__medium}
+              WHEN {% parameter audience_selector %} = 'Source' THEN ${traffic_source__source}
+              WHEN {% parameter audience_selector %} = 'Device' THEN ${device__category}
+              WHEN {% parameter audience_selector %} = 'Browser' THEN ${device__web_info__browser}
+              WHEN {% parameter audience_selector %} = 'Metro' THEN ${geo__metro}
+              WHEN {% parameter audience_selector %} = 'Country' THEN ${geo__country}
+              WHEN {% parameter audience_selector %} = 'Continent' THEN ${geo__continent}
+              WHEN {% parameter audience_selector %} = 'Language' THEN ${device__language}
+              WHEN {% parameter audience_selector %} = 'Operating System' THEN ${device__operating_system}
+        END;;
+  }
+
   dimension: event_id {
     primary_key: yes
     hidden: yes
