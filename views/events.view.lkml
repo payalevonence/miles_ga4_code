@@ -428,6 +428,8 @@ view: events {
     sql: array_agg(case when ${page_views.page_view_rank_asc}=1 then ${page} end ignore nulls)[0] ;;
   }
 
+############## Period Over Period Method 3. ################
+
     filter: current_date_range {
       type: date
       view_label: "_PoP"
