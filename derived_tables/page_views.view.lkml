@@ -11,10 +11,10 @@ view: page_views {
       bind_all_filters: yes
       filters: [events.event_name: "page_view"]
       derived_column: page_view_rank_asc {
-        sql: rank() over (partition by unique_session_id order by _event_time asc) ;;
+        sql: row_number() over (partition by unique_session_id order by _event_time asc) ;;
       }
       derived_column: page_view_rank_desc {
-        sql: rank() over (partition by unique_session_id order by _event_time desc) ;;
+        sql: row_number() over (partition by unique_session_id order by _event_time desc) ;;
       }
       derived_column: time_of_next_page_view {
         sql: lead(_event_time) over (partition by unique_session_id order by _event_time asc) ;;
