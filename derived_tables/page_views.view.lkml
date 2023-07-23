@@ -11,10 +11,10 @@ view: page_views {
       bind_all_filters: yes
       filters: [events.event_name: "page_view"]
       derived_column: page_view_rank_asc {
-        sql: row_number() over (partition by unique_session_id order by _event_time asc) ;;
+        sql: rank() over (partition by unique_session_id order by _event_time asc) ;;
       }
       derived_column: page_view_rank_desc {
-        sql: row_number() over (partition by unique_session_id order by _event_time desc) ;;
+        sql: rank() over (partition by unique_session_id order by _event_time desc) ;;
       }
       derived_column: time_of_next_page_view {
         sql: lead(_event_time) over (partition by unique_session_id order by _event_time asc) ;;
@@ -59,6 +59,34 @@ view: page_views {
     sql_start: ${_event_time_raw} ;;
     sql_end: ${time_of_next_page_view_raw} ;;
     value_format_name: decimal_0
+  }
+  dimension: is_bounce {
+    description: "If this pageview was the only pageview or screenview hit of a session, this is set to true."
+    type: yesno
+    sql: ${sessions.count_of_page_views} = 1 ;;
+  }
+  measure: total_bounces {
+    hidden: yes
+    type: count
+    filters: [is_bounce: "yes"]
+  }
+  measure: bounce_rate {
+    group_label: "Page"
+    label: "Page View Bounce Rate"
+    description: "The percentage of page views that are from sessions where only 1 page was viewed"
+    type: number
+    sql: ${total_bounces}/nullif(${events.count_of_page_views},0) ;;
+    value_format_name: percent_2
+  }
+  measure: total_exits {
+    type: count
+    description: "The number of exits from the property."
+    filters: [page_view_rank_desc: "1"]
+  }
+  measure: total_entrances {
+    type: count
+    description: "The number of entrances to the property measured as the first pageview in a session, typically used with Landing Page."
+    filters: [page_view_rank_asc: "1"]
   }
   measure: average_seconds_to_next_page {
     group_label: "Page"
