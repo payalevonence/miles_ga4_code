@@ -9,6 +9,8 @@ view: base_events {
     group_item_label: "Firebase App ID"
   }
 
+
+
   dimension: app_info__id {
     type: string
     sql: ${TABLE}.app_info.id ;;
@@ -376,6 +378,7 @@ view: base_events {
     sql: ${TABLE}.geo.country ;;
     group_label: "Geo"
     group_item_label: "Country"
+    map_layer_name: countries
   }
 
   dimension: geo__metro {
