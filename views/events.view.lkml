@@ -1,6 +1,7 @@
-include: "/views/base_events.view.lkml"
+include: "/views/*.view.lkml"
+include: "/derived_tables/*.view.lkml"
 view: events {
-  extends: [base_events]
+  extends: [base_events, goals, event_funnel, page_funnel]
   sql_table_name: `miles-partnership-ga4.analytics_{% parameter profile %}.events_*` ;;
 
   parameter: profile {
@@ -50,9 +51,9 @@ view: events {
 
   dimension: event_id {
     primary_key: yes
-    hidden: yes
+    hidden: no
     type: string
-    sql: concat(${_event_raw}, ${unique_session_id}, ${event_name}) ;;
+    sql: concat(${_event_raw}, '-' ,${unique_session_id}, '-', ${event_name}) ;;
   }
 
   dimension: ga_session_number {
@@ -137,6 +138,19 @@ view: events {
     sql: TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'\d\d\d\d\d\d\d\d'))) ;;
   }
 
+  measure: count_first_visit_events {
+    type: count
+    hidden: yes
+    filters: [event_name: "first_visit"]
+  }
+
+  measure: average_pageviews_per_session {
+    view_label: "Sessions"
+    type: number
+    value_format_name: decimal_1
+    sql: 1.0 * ${count_of_page_views}/nullif(${count_of_sessions},0) ;;
+}
+
   dimension_group: _event {
     label: "Event"
     timeframes: [raw,time,hour,minute]
@@ -167,6 +181,14 @@ view: events {
         when ${event_month} = ${one_month_ago_month} and ${event_day_of_month} <= ${today_day_of_month} then "Last Month to Date"
       end
     ;;
+  }
+
+  dimension: term {
+    label: "Keyword"
+    group_label: "Traffic Source"
+    description: "The Event keyword of the traffic source, usually set when the trafficSource.medium is 'organic' or 'cpc'. Can be set by the utm_term URL parameter."
+    type: string
+    sql: (SELECT value.string_value FROM UNNEST(event_params) WHERE key = "term") ;;
   }
 
   dimension: attribution_channel {
@@ -390,6 +412,12 @@ view: events {
       else '(Other)' end ;;
   }
 
+  dimension: full_event {
+    type: string
+    sql: ${event_name}||': '||coalesce(${page},"") ;;
+    full_suggestions: yes
+  }
+
   dimension: user_pseudo_id {
     type: string
     sql: ${TABLE}.user_pseudo_id ;;
@@ -411,6 +439,27 @@ view: events {
     view_label: "Sessions"
     sql: ${unique_session_id} ;;
   }
+  measure: total_purchase_revenue_usd {
+    group_label: "Ecommerce"
+    label: "Purchase Revenue (USD)"
+    type: sum_distinct
+    sql: ${ecommerce__purchase_revenue_in_usd} ;;
+    sql_distinct_key: ${ecommerce__transaction_id} ;;
+    value_format_name: usd
+  }
+  measure: transaction_revenue_per_user {
+    group_label: "Ecommerce"
+    type: number
+    sql: 1.0 * ${total_purchase_revenue_usd}/nullif(${count_of_users},0) ;;
+    value_format_name: usd
+  }
+  measure: count_of_transactions {
+    group_label: "Ecommerce"
+    label: "Transactions"
+    type: count_distinct
+    sql: ${ecommerce__transaction_id} ;;
+    filters: [ecommerce__transaction_id: "-(not set)"]
+  }
   measure: first_event {
     hidden: yes
     type: date_time
@@ -420,6 +469,29 @@ view: events {
     hidden: yes
     type: date_time
     sql: MAX(${_event_raw}) ;;
+  }
+
+  measure: exit_rate {
+    group_label: "Page"
+    description: "Exit is (number of exits) / (number of pageviews) for the page or set of pages. It indicates how often users exit from that page or set of pages when they view the page(s)."
+    type: number
+    sql: ${page_views.total_exits}/nullif(${count_of_page_views},0) ;;
+    value_format_name: percent_2
+  }
+
+  measure: transaction_conversion_rate {
+    group_label: "Ecommerce"
+    label: "Transaction Conversion Rate"
+    type: number
+    sql: 1.0 * (${count_of_transactions}/NULLIF(${count_of_sessions},0)) ;;
+    value_format_name: percent_2
+  }
+  measure: entrance_rate {
+    group_label: "Page"
+    description:"The percentage of 'Page View' events in which this page was the entrance."
+    type: number
+    sql: ${page_views.total_entrances}/nullif(${count_of_page_views},0) ;;
+    value_format_name: percent_2
   }
 
   measure: landing_page {
