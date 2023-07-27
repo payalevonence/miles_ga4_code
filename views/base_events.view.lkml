@@ -376,6 +376,7 @@ view: base_events {
     sql: ${TABLE}.geo.country ;;
     group_label: "Geo"
     group_item_label: "Country"
+    map_layer_name: countries
   }
 
   dimension: geo__metro {

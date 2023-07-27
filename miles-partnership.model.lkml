@@ -8,7 +8,7 @@ explore: events {
   always_filter: {
     filters: [
       events.event_date: "last 7 days",
-      events.profile: "269520886"
+#      events.profile: "269520886"
       ]
   }
 

@@ -2,19 +2,19 @@ include: "/views/*.view.lkml"
 include: "/derived_tables/*.view.lkml"
 view: events {
   extends: [base_events, goals, event_funnel, page_funnel]
-  sql_table_name: `miles-partnership-ga4.analytics_{% parameter profile %}.events_*` ;;
+  sql_table_name: `miles-partnership-ga4.analytics_{{ _user_attributes['analytics_dataset'] }}.events_*` ;;
 
-  parameter: profile {
-    type: unquoted
-    allowed_value: {
-      label: "occroadhouse"
-      value: "269520886"
-    }
-    allowed_value: {
-      label: "alaskatia"
-      value: "347778234"
-    }
-  }
+  # parameter: profile {
+  #   type: unquoted
+  #   allowed_value: {
+  #     label: "occroadhouse"
+  #     value: "269520886"
+  #   }
+  #   allowed_value: {
+  #     label: "alaskatia"
+  #     value: "347778234"
+  #   }
+  # }
 
   parameter: audience_selector {
     description: "Use to set 'Audience Trait' field to dynamically choose a user cohort."
