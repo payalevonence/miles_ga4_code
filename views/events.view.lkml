@@ -439,6 +439,7 @@ view: events {
     type: count_distinct
     view_label: "Sessions"
     sql: ${unique_session_id} ;;
+    drill_fields: [unique_session_id]
   }
   measure: total_purchase_revenue_usd {
     group_label: "Ecommerce"
