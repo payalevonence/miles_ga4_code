@@ -16,6 +16,7 @@ view: events {
   #   }
   # }
 
+
   parameter: audience_selector {
     description: "Use to set 'Audience Trait' field to dynamically choose a user cohort."
     type: string
