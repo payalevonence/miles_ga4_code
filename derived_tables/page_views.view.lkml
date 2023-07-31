@@ -7,6 +7,7 @@ view: page_views {
     explore_source: events {
       column: _event_time {}
       column: event_id {}
+      column: page {}
       column: unique_session_id {}
       bind_all_filters: yes
       filters: [events.event_name: "page_view"]
@@ -18,6 +19,60 @@ view: page_views {
       }
       derived_column: time_of_next_page_view {
         sql: lead(_event_time) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_1 {
+        sql: lag(page,1) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_2 {
+        sql: lag(page,2) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_3 {
+        sql: lag(page,3) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_4 {
+        sql: lag(page,4) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_5 {
+        sql: lag(page,5) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_6 {
+        sql: lag(page,6) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_7 {
+        sql: lag(page,7) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_8 {
+        sql: lag(page,8) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_minus_9 {
+        sql: lag(page,9) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_1 {
+        sql: lead(page,1) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_2 {
+        sql: lead(page,2) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_3 {
+        sql: lead(page,3) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_4 {
+        sql: lead(page,4) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_5 {
+        sql: lead(page,5) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_6 {
+        sql: lead(page,6) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_7 {
+        sql: lead(page,7) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_8 {
+        sql: lead(page,8) over (partition by unique_session_id order by _event_time asc) ;;
+      }
+      derived_column: current_page_plus_9 {
+        sql: lead(page,9) over (partition by unique_session_id order by _event_time asc) ;;
       }
     }
   }
@@ -40,6 +95,96 @@ view: page_views {
     label: "Page View Reverse Rank"
     description: "Reverse Rank of 'Page View' Event, 1 = Last Event"
     sql: ${TABLE}.page_view_rank_desc ;;
+  }
+  dimension: current_page_minus_1 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 1 pages before current page."
+  }
+  dimension: current_page_minus_2 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 2 pages before current page."
+  }
+  dimension: current_page_minus_3 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 3 pages before current page."
+  }
+  dimension: current_page_minus_4 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 4 pages before current page."
+  }
+  dimension: current_page_minus_5 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 5 pages before current page."
+  }
+  dimension: current_page_minus_6 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 6 pages before current page."
+  }
+  dimension: current_page_minus_7 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 7 pages before current page."
+  }
+  dimension: current_page_minus_8 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 8 pages before current page."
+  }
+  dimension: current_page_minus_9 {
+    view_label: "Page Flow"
+    group_label: "Reverse Path Path"
+    description: "Page Path for page that came 9 pages before current page."
+  }
+  dimension: current_page_plus_1 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 1 pages after current page."
+  }
+  dimension: current_page_plus_2 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 2 pages after current page."
+  }
+  dimension: current_page_plus_3 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 3 pages after current page."
+  }
+  dimension: current_page_plus_4 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 4 pages after current page."
+  }
+  dimension: current_page_plus_5 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 5 pages after current page."
+  }
+  dimension: current_page_plus_6 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 6 pages after current page."
+  }
+  dimension: current_page_plus_7 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 7 pages after current page."
+  }
+  dimension: current_page_plus_8 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 8 pages after current page."
+  }
+  dimension: current_page_plus_9 {
+    view_label: "Page Flow"
+    group_label: "Relative Page Path"
+    description: "Page Path for page that came 9 pages after current page."
   }
   dimension_group: time_of_next_page_view {
     type: time
